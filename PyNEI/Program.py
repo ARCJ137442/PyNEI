@@ -185,7 +185,7 @@ class Cmdline(NARSProgram):
     def terminate(self):
         """终止程序 TODO：似乎未能正确关闭，会报错"""
         try:
-            self.process.send_signal(signal.CTRL_C_EVENT)
+            # self.process.send_signal(signal.CTRL_C_EVENT) # 暂时关闭：可能会误伤主进程 @ ttt
             self.process.terminate()
             self.process = None # 空置
         except BaseException as e:
@@ -309,7 +309,7 @@ class Cmdline(NARSProgram):
     def read_line(self, out): # read line without blocking
         "读取程序的（命令行）输出"
         for line in iter(out.readline, b'\n'):
-            self.out_hook(line) # 传递单个输出行到指定外接钩子
+            self.out_hook and self.out_hook(line) # 传递单个输出行到指定外接钩子
         out.close() # 关闭输出流
     
     def catch_operation_name(self, line:str):

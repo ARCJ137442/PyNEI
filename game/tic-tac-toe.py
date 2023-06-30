@@ -217,8 +217,11 @@ def markers_str(markers, rowsep:str='\n', colsep:str='', empty:str='_'):
         for i in range(BOARD_SIZE)
     )
 
+from os import system
+
 def print_markers():
     global marker
+    system('cls')
     print(markers_str(markers=marker))
 
 def draw_board() -> bool:
@@ -382,7 +385,7 @@ def pretrain(count:int):
             continue
         # 清除
         playerType = players[player].type.value if (isNARS:=isinstance(nars, NARSPlayer)) else players[player]
-        print(f'Deleted player {player}({playerType}) with n_win={stat_win[player]}')
+        print(f'Deleted player {player}({playerType}) with n_win={stat_win.get(player,0)}')
         if isNARS:
             delete_nars(player)
         else:
@@ -460,6 +463,8 @@ if __name__ == '__main__':
     # 设置颜色
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
+    
+    reset_game()
     
     set_timers()
     

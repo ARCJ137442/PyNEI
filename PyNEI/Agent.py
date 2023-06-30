@@ -170,7 +170,7 @@ class NARSAgent:
         ]
     
     def _handle_out_line(self, line:str): # get operations
-        if self.brain.out_hook and (operation_name := self.brain.catch_operation_name(line)): # 从一行语句中获得操作
+        if self.brain and self.brain.out_hook and (operation_name := self.brain.catch_operation_name(line)): # 从一行语句中获得操作
             self.handle_program_operation(
                 NARSOperation(operation_name) # 从字符串到操作（打包）
             ) # 传递一个「纳思操作」

@@ -8,9 +8,7 @@
 """
 
 import threading # 用于打开线程
-import queue
 import subprocess # 用于打开进程
-import signal # 用于终止程序
 
 from enum import Enum # 枚举NARS类型
 
@@ -36,7 +34,7 @@ class NARSType(Enum):
 
 """具体与纳思通信的「程序」
 核心功能：负责与「NARS的具体计算机实现」沟通
-- 例：封装好的NARS程序包（支持命令行交互
+- 例：封装好的NARS程序包（支持命令行交互）
 """
 class NARSProgram:
     
@@ -99,14 +97,22 @@ class NARSProgram:
         "（API）功能分离：启动NARS程序"
         pass
     
-    def terminate(self):
-        """（API）终止程序"""
+    @property
+    def isAlive(self) -> bool:
+        "（API）控制自身是否「活着」（在terminate后必须为False）"
         pass
+    
+    def terminate(self):
+        """终止程序"""
+        self.out_hook = None # 空置而非del
+        self._cached_inputs = None
 
     # 用析构函数替代「process_kill」方法
     def __del__(self):
         "程序结束时，自动终止NARS"
         self.terminate()
+        del self.out_hook
+        del self._cached_inputs
     
     # 语句相关 #
     
@@ -167,7 +173,9 @@ class NARSProgram:
 class Cmdline(NARSProgram):
     """抽象类：所有用命令行实现的CIN
     - 使用一个子进程，运行CIN主程序
-    - 使用两个子线程，分别执行CIN进程的I/O任务
+    - 现在使用asyncio库实现异步交互
+        - 从asyncio启动一个主进程
+        - 使用两个异步函数实现交互
     """
     
     def __init__(self, out_hook=None):
@@ -180,16 +188,34 @@ class Cmdline(NARSProgram):
         self._launch_thread_read()
         self._launch_thread_write()
     
+    def __del__(self):
+        del self.process
+        del self.read_line_thread
+        del self.write_line_thread
+        super().__del__()
+    
     # 进程相关 #
     
+    @property
+    def isAlive(self) -> bool:
+        return hasattr(self,'process') and self.process
+    
     def terminate(self):
-        """终止程序 TODO：似乎未能正确关闭，会报错"""
+        """终止程序（终止后就不使用了）
+        """
         try:
             # self.process.send_signal(signal.CTRL_C_EVENT) # 暂时关闭：可能会误伤主进程 @ ttt
             self.process.terminate()
-            self.process = None # 空置
+            self.process.kill()
+            # 清除残留线程（主要是读，写进程已经自动关闭了）
+            self.process = None # 空置而非del（防止变量未定义报错）
+            # self.read_line_thread.join() # 使用join仍然无法清除残余进程
+            # self.write_line_thread.join()
+            self.read_line_thread = None
+            self.write_line_thread = None
         except BaseException as e:
             print(f'Failed to terminate process: {e}')
+        super().terminate()
     
     def _launch_CIN(self):
         """并行启动CIN
@@ -206,7 +232,7 @@ class Cmdline(NARSProgram):
             shell=False
         )
         self.launch_program() # 「具体启动程序」交给剩下的子类实现
-        self.write_line('*volume=0')
+        self.add_input('*volume=0')
         
     def launch_program(self):
         "直接启动程序"
@@ -229,7 +255,7 @@ class Cmdline(NARSProgram):
         "开启子线程，负责接收NARS程序的输出"
         # 创建线程对象 self.read_line_thread
         self.read_line_thread = self._launch_thread(
-            target=self.read_line, # 目标函数是 self.read_line
+            target=self.read_line, # 目标函数是 self.read_line(⚠debug后记：注意排查钩子函数中潜在的死循环)
             args=(self.process.stdout,) # 将 self.process.stdout 作为参数传递给 self.read_line 方法
         )
 
@@ -306,11 +332,15 @@ class Cmdline(NARSProgram):
     
     # 运行时相关 #
 
-    def read_line(self, out): # read line without blocking
+    def read_line(self, stdout): # read line without blocking
         "读取程序的（命令行）输出"
-        for line in iter(out.readline, b'\n'):
-            self.out_hook and self.out_hook(line) # 传递单个输出行到指定外接钩子
-        out.close() # 关闭输出流
+        for line in iter(stdout.readline, b'\n'):
+            # 每次运行时检查自身「是否存活」，若程序已终止，则退出「结束后不断输出空字符」的死循环！
+            if not self.isAlive:
+                break
+            # 传递单个输出行到指定外接钩子
+            self.out_hook and self.out_hook(line.strip())
+        stdout.close() # 关闭输出流
     
     def catch_operation_name(self, line:str):
         "（API）从输出的一行（语句）中获取信息，并返回截取到的「操作字符串」"
@@ -318,7 +348,7 @@ class Cmdline(NARSProgram):
     
     def async_write_lines(self, stdin):
         "从自身指令缓冲区中读取输入，送入程序的stdin中"
-        while self.process != None: # 始终运行，读取缓冲区中的指令列表
+        while self.isAlive: # 始终运行，读取缓冲区中的指令列表
             if self._cached_inputs:
                 cmd:str = self._cached_inputs.pop(0) # 取最开头（pop(0)代替shift）
                 self.add_input(cmd) # 异步调用（不阻塞主进程）

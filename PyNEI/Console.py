@@ -44,15 +44,19 @@ class NARSConsole():
         # self.program.add_to_cmd('\n') # 直接添加进命令行
         self._clear_out_buffer() # 清除cmd启动时、CIN启动前的输出
         while True:
-            # 遍历处理输出（同步）
-            if not self.async_out:
-                for out_line in self._out_buffer:
-                    self.handle_out_line(line=out_line)
-                self._clear_out_buffer() # 清除缓冲
-            # 处理输入
-            if inp:=input(self.input_prompt):
-                # 注：无需对数字「推理步骤」进行特殊识别，其效果与直接在命令行输入等价
-                self.program.add_input(inp + '\n') # 直接添加进命令行，附加换行后缀
+            try:
+                # 遍历处理输出（同步）
+                if not self.async_out:
+                    for out_line in self._out_buffer:
+                        self.handle_out_line(line=out_line)
+                    self._clear_out_buffer() # 清除缓冲
+                # 处理输入
+                if inp:=input(self.input_prompt):
+                    # 注：无需对数字「推理步骤」进行特殊识别，其效果与直接在命令行输入等价
+                    self.program.add_input(inp + '\n') # 直接添加进命令行，附加换行后缀
+            except KeyboardInterrupt: # Ctrl+C退出
+                self.program.terminate()
+                break
     
     def _out_hook(self, line:str) -> None:
         "处理NARSProgram的输出"
@@ -68,4 +72,4 @@ class NARSConsole():
     
     def handle_out_line(self, line:str) -> None:
         "真正处理输出"
-        print(line)
+        line and print(line)

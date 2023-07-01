@@ -380,17 +380,21 @@ def pretrain(count:int):
     print(f'Pretrain completed:', stat_win)
     # 取胜利数量最大的一个AI
     winner, max_win = max(stat_win.items(), key=lambda x:x[1]) # 取value（胜利数）
-    for player, nars in players.items():
-        if player == winner:
-            continue
-        # 清除
-        playerType = players[player].type.value if (isNARS:=isinstance(nars, NARSPlayer)) else players[player]
-        print(f'Deleted player {player}({playerType}) with n_win={stat_win.get(player,0)}')
-        if isNARS:
-            delete_nars(player)
-        else:
-            players[player] = None
-    print(f'Picked player {winner}({players[winner]}) with n_win={max_win}')
+    # 处理「打平手」情况
+    if winner:
+        for player, nars in players.items():
+            if player == winner:
+                continue
+            # 清除
+            playerType = players[player].type.value if (isNARS:=isinstance(nars, NARSPlayer)) else players[player]
+            print(f'Deleted player {player}({playerType}) with n_win={stat_win.get(player,0)}')
+            if isNARS:
+                delete_nars(player)
+            else:
+                players[player] = None
+        print(f'Picked player {winner}({players[winner]}) with n_win={max_win}')
+    else: # 否则继续训练
+        pretrain(count)
     # 清除胜利统计
     clearStat(stat_win)
     

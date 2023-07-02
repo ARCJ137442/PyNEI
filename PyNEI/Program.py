@@ -109,8 +109,7 @@ class NARSProgram:
 
     # 用析构函数替代「process_kill」方法
     def __del__(self):
-        "程序结束时，自动终止NARS"
-        self.terminate()
+        "现不会自动终止NARS：del撞上终止指令，可能遇到「变量未定义」错误"
         del self.out_hook
         del self._cached_inputs
     
@@ -204,7 +203,8 @@ class Cmdline(NARSProgram):
         """终止程序（终止后就不使用了）
         """
         try:
-            # self.process.send_signal(signal.CTRL_C_EVENT) # 暂时关闭：可能会误伤主进程 @ ttt
+            # 停止CIN子进程
+            # self.process.send_signal(signal.CTRL_C_EVENT) # 停用：可能误伤主进程
             self.process.terminate()
             self.process.kill()
             # 清除残留线程（主要是读，写进程已经自动关闭了）

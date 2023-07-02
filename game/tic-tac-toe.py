@@ -202,6 +202,11 @@ def installNARSes(narses):
         if not narses[key]: # 若无则填充
             narses[key] = getPlayer(f'type of player {key}: ')
 
+def terminateNARSes(narses):
+    for nars in narses:
+        if isinstance(nars, NARSPlayer):
+            nars.disconnect_brain()
+
 installNARSes(players)
 
 # 绘制棋盘
@@ -478,6 +483,7 @@ if __name__ == '__main__':
             # 游戏退出
             if event.type == pygame.QUIT:
                 pygame.quit()
+                terminateNARSes()
                 sys.exit()
             
             # 更新NARS操作

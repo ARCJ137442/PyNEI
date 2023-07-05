@@ -290,7 +290,7 @@ class Cmdline(NARSProgram):
     def add_perception(self, perception:NARSPerception) -> None:
         "统一添加感知"
         self.write_line(
-            self.__class__.SENSE_TEMPLETE % (perception.object, perception.adjective) # 套模板
+            self.__class__.SENSE_TEMPLETE % (perception.subject, perception.adjective) # 套模板
         )
     
     # 目标

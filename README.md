@@ -2,7 +2,9 @@
 
 一个以 ***NARS*** 作为AI玩家，提供集成访问&调用的接口
 
-- 前身：[ARCJ137442/NARS-FighterPlane](https://github.com/ARCJ137442/NARS-FighterPlane) v2.i_alpha
+- 前身：
+  - **徐博洋「NARS战机」：[Noctis-Xu/NARS-FighterPlane](https://github.com/Noctis-Xu/NARS-FighterPlane)**
+  - [ARCJ137442/NARS-FighterPlane](https://github.com/ARCJ137442/NARS-FighterPlane/tree/master/NARS-FighterPlane_v2.i_alpha) v2.i_alpha
 - 缩写：NEI
 
 ## Concept 概念

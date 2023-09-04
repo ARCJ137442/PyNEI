@@ -10,7 +10,7 @@
 ## Concept 概念
 
 - NARS: Non-Axiomatic Reasoning System | 非公理推理系统
-- NAL: Non-Axiomatic Language | 非公理语言
+- NAL: Non-Axiomatic Logic | 非公理逻辑
 - CIN: Computer Implementation of NARS  | NARS的计算机实现
 
 ## Preparation 预备

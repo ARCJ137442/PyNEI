@@ -1,11 +1,15 @@
+from os import getcwd
 import pygame
 import random
 
-SCREEN_RECT = pygame.Rect(0, 0, 480, 700)  # the size of game window, Rect(left, top, width, height). left = x, top = y
+# the size of game window, Rect(left, top, width, height). left = x, top = y
+SCREEN_RECT = pygame.Rect(0, 0, 480, 700)
 
-from os import getcwd
 # VSCode调试的「当前工作路径」是项目根目录「Python」，故需要/game
-ASSETS_PATH = "%s/assets/NARS-FighterPlane" % ("." if "game" in getcwd() else "./game") # 根据启动路径不同，自动调整（预处理）
+# 根据启动路径不同，自动调整（预处理）
+ASSETS_PATH = "%s/assets/NARS-FighterPlane" % (
+    "." if "game" in getcwd() else "./game")
+
 
 class GameSprite(pygame.sprite.Sprite):
     def __init__(self, image_name, speed=1):
@@ -70,7 +74,7 @@ class Hero(GameSprite):
         elif self.rect.right >= SCREEN_RECT.right:  # check the right boundary
             return 1
         return 0
-    
+
     def fire(self):
         # print("fire")
         for i in [0]:

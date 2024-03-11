@@ -36,7 +36,7 @@ NARS计算机实现
 - ONA: <https://github.com/opennars/OpenNARS-for-Applications>
 - NARS-in-Python: <https://github.com/ccrock4t/NARS-Python>
 
-NARS+ & 游戏Domo
+NARS+ & 游戏Demo
 
 - NARS-Pong in Unity3D: <https://github.com/ccrock4t/NARS-Pong>
 - NARS-FighterPlane by Boyang Xu: <https://github.com/Noctis-Xu/NARS-FighterPlane>

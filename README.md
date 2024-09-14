@@ -1,5 +1,19 @@
 # NARS-Embodied-Interface NARS具身接口
 
+![GitHub License](https://img.shields.io/github/license/ARCJ137442/PyNEI?style=for-the-badge&color=0288d1)
+![Code Size](https://img.shields.io/github/languages/code-size/ARCJ137442/PyNEI?style=for-the-badge&color=0288d1)
+![Lines of Code](https://www.aschey.tech/tokei/github.com/ARCJ137442/PyNEI?style=for-the-badge&color=0288d1)
+[![Language](https://img.shields.io/badge/language-Python-blue?style=for-the-badge&color=0288d1)](https://www.python.org/)
+
+开发状态：
+
+![Created At](https://img.shields.io/github/created-at/ARCJ137442/PyNEI?style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/ARCJ137442/PyNEI?style=for-the-badge)
+
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-2.0.0-%23FE5196?style=for-the-badge)](https://conventionalcommits.org)
+
+## 简介
+
 一个以 ***NARS*** 作为AI玩家，提供集成访问&调用的接口
 
 - 前身：
